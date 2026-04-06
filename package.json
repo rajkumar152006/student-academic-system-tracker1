@@ -1,0 +1,10 @@
+{
+  "name": "student-academic-milestone-tracker",
+  "version": "1.0.0",
+  "description": "MERN stack student dashboard with admin panel",
+  "scripts": {
+    "start": "npx concurrently \"cd server && npm start\" \"cd client && npm start\"",
+    "server": "cd server && npm start",
+    "client": "cd client && npm start"
+  }
+}

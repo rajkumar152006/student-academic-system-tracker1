@@ -1,0 +1,586 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* reference variables from index.css - kept here for local overrides if needed */
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: transparent;
+  color: #f8fafc;
+}
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background: #0f1419;
+}
+
+.dashboard-sidebar {
+  width: 240px;
+  background: #1e293b;
+  box-shadow: 2px 0 30px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-item {
+  padding: 12px 14px;
+  margin: 10px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 8px;
+  transition: all 0.22s ease;
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.sidebar-item:hover {
+  background: rgba(14, 165, 233, 0.1);
+  color: #f8fafc;
+  transform: translateX(6px);
+}
+
+.sidebar-item.active {
+  background: #0ea5e9;
+  color: white;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+}
+
+.sidebar-icon {
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 34px;
+  background: #0f1419;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  color: #f8fafc;
+  font-size: 24px;
+  font-weight: 700;
+  letterSpacing: '-0.5px';
+}
+
+.btn-logout {
+  padding: 10px 16px;
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: #0284c7;
+  transform: translateY(-2px);
+}
+
+/* Profile Page */
+.profile-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profile-header {
+  margin-bottom: 30px;
+}
+
+.profile-title {
+  font-size: 28px;
+  color: #f8fafc;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letterSpacing: '-0.5px';
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.profile-field {
+  background: #0f172a;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #0ea5e9;
+}
+
+.profile-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.profile-field-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.attendance-section {
+  margin-top: 30px;
+}
+
+.attendance-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #f8fafc;
+}
+
+.attendance-chart {
+  background: #0f172a;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Academic Page */
+.academic-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.academic-title {
+  font-size: 28px;
+  color: #f8fafc;
+  margin-bottom: 25px;
+  font-weight: 700;
+  letterSpacing: '-0.5px';
+}
+
+.subjects-section {
+  margin-bottom: 35px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0ea5e9;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.subjects-table thead {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.subjects-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subjects-table td {
+  padding: 14px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+}
+
+.subjects-table tbody tr {
+  transition: background 0.2s ease;
+  background: transparent;
+}
+
+.subjects-table tbody tr:hover {
+  background: rgba(14, 165, 233, 0.1);
+  color: #f8fafc;
+}
+
+.sgpa-section {
+  margin-bottom: 30px;
+}
+
+.sgpa-bars-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.sgpa-bar-item {
+  background: #0ea5e9;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2);
+  transition: all 0.25s ease;
+}
+
+.sgpa-bar-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+  background: #0284c7;
+}
+
+.sgpa-semester {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  margin-bottom: 8px;
+}
+
+.sgpa-value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.sgpa-chart-container {
+  background: #0f172a;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cgpa-section {
+  background: #0f172a;
+  padding: 25px;
+  border-radius: 10px;
+  margin-top: 25px;
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Achievements Page */
+.achievements-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.achievements-title {
+  font-size: 28px;
+  color: #f8fafc;
+  margin-bottom: 25px;
+  font-weight: 700;
+  letterSpacing: '-0.5px';
+}
+
+.achievements-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.achievement-card {
+  background: #0ea5e9;
+  padding: 22px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.2);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.achievement-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+  background: #0284c7;
+}
+
+.achievement-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.achievement-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  margin-bottom: 10px;
+}
+
+.achievement-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+/* Admin Page */
+.admin-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+}
+
+.admin-students-list {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-list-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #f8fafc;
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.student-item:hover {
+  background: rgba(14, 165, 233, 0.1);
+  transform: translateX(6px);
+}
+
+.student-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+}
+
+.student-info-list {
+  flex: 1;
+}
+
+.student-name {
+  font-weight: 700;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.student-roll {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.admin-details {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-details-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #f8fafc;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.detail-item {
+  background: #0f172a;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #0ea5e9;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.detail-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+/* Login Page */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #0f1419;
+}
+
+.login-card {
+  background: #1e293b;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #94a3b8;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-form-group {
+  margin-bottom: 18px;
+}
+
+.login-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 14px;
+  background: #0f172a;
+  color: #f8fafc;
+  transition: all 0.3s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-button:hover {
+  background: #0284c7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    height: auto;
+    display: flex;
+    gap: 10px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .achievements-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .sgpa-bars-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
