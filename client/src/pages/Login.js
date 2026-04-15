@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from '../utils/api';
 import '../styles/Dashboard.css';
 
 function Login() {
@@ -18,7 +18,7 @@ function Login() {
       return;
     }
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { rollNumber: roll, password });
+      const res = await axios.post('/api/auth/login', { rollNumber: roll, password });
       if (res.status === 200) {
         const studentData = res.data.student || res.data;
         localStorage.setItem('student', JSON.stringify(studentData));

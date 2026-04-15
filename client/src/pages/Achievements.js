@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../utils/api';
 
 export default function Achievements({ student }) {
   const [viewType, setViewType] = useState(null);
@@ -14,7 +14,7 @@ export default function Achievements({ student }) {
     if (student?._id) {
       const fetchStudent = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/students/${student._id}`);
+          const res = await axios.get(`/api/students/${student._id}`);
           setStudentData(res.data);
         } catch (err) {
           console.error('Error fetching student:', err);
@@ -39,7 +39,7 @@ export default function Achievements({ student }) {
       if (form.file) {
         const fd = new FormData();
         fd.append('file', form.file);
-        const up = await axios.post('http://localhost:5000/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        const up = await axios.post('/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         proofUrl = up.data.url;
       }
 
@@ -52,12 +52,12 @@ export default function Achievements({ student }) {
         marks: 0,
         remarks: ''
       };
-      await axios.post(`http://localhost:5000/api/students/${student._id}/achievements`, { type, item });
+      await axios.post(`/api/students/${student._id}/achievements`, { type, item });
       alert('✅ Submitted for admin approval');
       setForm({ name: '', description: '', date: '', file: null });
       setViewType(null);
       // Refresh student data
-      const res = await axios.get(`http://localhost:5000/api/students/${student._id}`);
+      const res = await axios.get(`/api/students/${student._id}`);
       setStudentData(res.data);
     } catch (err) {
       console.error('Error:', err);

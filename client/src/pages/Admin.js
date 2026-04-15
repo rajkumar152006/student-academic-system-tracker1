@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/api';
 import '../styles/Dashboard.css';
 
 export default function Admin() {
@@ -35,7 +35,7 @@ export default function Admin() {
     try {
       setLoading(true);
       setError('');
-      const res = await axios.get('http://localhost:5000/api/students');
+      const res = await axios.get('/api/students');
       setStudents(res.data || []);
     } catch (err) {
       console.error('Error fetching students:', err);
@@ -48,7 +48,7 @@ export default function Admin() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/students/notifications/list');
+      const res = await axios.get('/api/students/notifications/list');
       setNotifications(res.data || []);
       setNotificationCount(res.data?.length || 0);
     } catch (err) {
@@ -61,7 +61,7 @@ export default function Admin() {
     try {
       setLoading(true);
       setError('');
-      const res = await axios.get(`http://localhost:5000/api/students/${id}`);
+      const res = await axios.get(`/api/students/${id}`);
       if (!res.data) {
         setError('Student not found');
         return;
@@ -148,7 +148,7 @@ export default function Admin() {
   const handleSaveEdit = async () => {
     try {
       setLoading(true);
-      const res = await axios.put(`http://localhost:5000/api/students/${editForm._id}`, editForm);
+      const res = await axios.put(`/api/students/${editForm._id}`, editForm);
       setSelected(res.data);
       setStudents(students.map(s => s._id === res.data._id ? res.data : s));
       setEditMode(false);
@@ -167,7 +167,7 @@ export default function Admin() {
     if (!window.confirm(`Delete ${selected.name}?`)) return;
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:5000/api/students/${selected._id}`);
+      await axios.delete(`/api/students/${selected._id}`);
       setStudents(students.filter(s => s._id !== selected._id));
       setSelected(null);
       alert('✅ Student deleted');
@@ -186,7 +186,7 @@ export default function Admin() {
         return;
       }
       updated[listName][idx][field] = value;
-      const res = await axios.put(`http://localhost:5000/api/students/${selected._id}`, updated);
+      const res = await axios.put(`/api/students/${selected._id}`, updated);
       setSelected(res.data);
       setStudents(students.map(s => s._id === res.data._id ? res.data : s));
       fetchNotifications();
@@ -512,7 +512,7 @@ export default function Admin() {
                     </div>
 
                     {/* Submissions */}
-                    {((selected.projectsList?.length) || (selected.internshipsList?.length) || (selected.hackathonsList?.length)) > 0 && (
+                    {((selected.projectsList?.length > 0) || (selected.internshipsList?.length > 0) || (selected.hackathonsList?.length > 0)) && (
                       <div style={{ marginBottom: 24 }}>
                         <h5 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: 12, fontSize: '14px', letterSpacing: '-0.2px' }}>Submissions</h5>
                         <div style={{ display: 'grid', gap: 12 }}>
