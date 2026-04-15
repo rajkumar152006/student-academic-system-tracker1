@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../utils/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Wrench, BookOpen, FileText, Briefcase, Award, Target, Upload, CheckCircle, XCircle, Clock, ArrowLeft, ExternalLink } from 'lucide-react';
 
 export default function Achievements({ student }) {
   const [viewType, setViewType] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', description: '', date: '', file: null });
   const [submitting, setSubmitting] = useState(false);
   const [studentData, setStudentData] = useState(student);
 
-  // Fetch latest student data to show approved/rejected achievements
   useEffect(() => {
     if (student?._id) {
       const fetchStudent = async () => {
@@ -22,10 +22,10 @@ export default function Achievements({ student }) {
         }
       };
       fetchStudent();
-      const interval = setInterval(fetchStudent, 5000); // Refresh every 5 seconds
+      const interval = setInterval(fetchStudent, 5000);
       return () => clearInterval(interval);
     }
-  }, [student?._id]);
+  }, [student, student?._id]);
 
   const handleFileChange = (e) => setForm({ ...form, file: e.target.files[0] });
 
@@ -56,7 +56,6 @@ export default function Achievements({ student }) {
       alert('✅ Submitted for admin approval');
       setForm({ name: '', description: '', date: '', file: null });
       setViewType(null);
-      // Refresh student data
       const res = await axios.get(`/api/students/${student._id}`);
       setStudentData(res.data);
     } catch (err) {
@@ -90,43 +89,54 @@ export default function Achievements({ student }) {
   const pendingHackathons = (sd.hackathonsList || []).filter(p => p.status === 'pending');
 
   const achievements = [
-    { icon: '🛠️', label: 'Projects', value: approvedProjects.length, type: 'projects' },
-    { icon: '📖', label: 'Online Courses', value: approvedCourses.length, type: 'courses' },
-    { icon: '📄', label: 'Paper Presentations', value: approvedPapers.length, type: 'papers' },
-    { icon: '💼', label: 'Internships', value: approvedInternships.length, type: 'internships' },
-    { icon: '🏆', label: 'Hackathons', value: approvedHackathons.length, type: 'hackathons' },
-    { icon: '🎯', label: 'Placement', value: `${sd.achievements?.placement?.placementPercentage ?? 0}%`, type: 'placement' },
+    { icon: <Wrench size={32} />, label: 'Projects', value: approvedProjects.length, type: 'projects' },
+    { icon: <BookOpen size={32} />, label: 'Online Courses', value: approvedCourses.length, type: 'courses' },
+    { icon: <FileText size={32} />, label: 'Papers', value: approvedPapers.length, type: 'papers' },
+    { icon: <Briefcase size={32} />, label: 'Internships', value: approvedInternships.length, type: 'internships' },
+    { icon: <Award size={32} />, label: 'Hackathons', value: approvedHackathons.length, type: 'hackathons' },
+    { icon: <Target size={32} />, label: 'Placement', value: `${sd.achievements?.placement?.placementPercentage ?? 0}%`, type: 'placement' },
   ];
 
   const renderSubmissionCard = (item) => {
-    const statusColors = {
-      approved: { bg: 'rgba(16,185,129,0.15)', border: '#10b981', icon: '✅', label: 'Approved' },
-      rejected: { bg: 'rgba(239,68,68,0.15)', border: '#dc2626', icon: '❌', label: 'Rejected' },
-      pending: { bg: 'rgba(59,130,246,0.15)', border: '#60a5fa', icon: '⏳', label: 'Pending' }
+    const statusConfig = {
+      approved: { bg: 'var(--success-bg)', text: 'var(--success)', icon: <CheckCircle size={14} />, label: 'Approved', border: 'rgba(16, 185, 129, 0.2)' },
+      rejected: { bg: 'var(--danger-bg)', text: 'var(--danger)', icon: <XCircle size={14} />, label: 'Rejected', border: 'rgba(239, 68, 68, 0.2)' },
+      pending: { bg: 'var(--primary-light)', text: 'var(--primary)', icon: <Clock size={14} />, label: 'Pending', border: 'rgba(14, 165, 233, 0.2)' }
     };
-    const colors = statusColors[item.status] || statusColors.pending;
+    const c = statusConfig[item.status] || statusConfig.pending;
 
     return (
       <div key={item.name} style={{
-        background: colors.bg,
-        padding: 16,
-        borderRadius: 8,
-        border: `2px solid ${colors.border}`,
-        marginBottom: 12
+        background: 'var(--surface)', padding: 20, borderRadius: 12,
+        border: `1px solid ${c.border}`, marginBottom: 16, boxShadow: 'var(--shadow-sm)'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 8 }}>
-          <h4 style={{ color: '#f8fafc', margin: 0 }}>{item.name}</h4>
-          <span style={{ background: colors.border, color: 'white', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
-            {colors.icon} {colors.label}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+          <h4 style={{ color: 'var(--text-main)', margin: 0, fontSize: 16, fontWeight: 700 }}>{item.name}</h4>
+          <span style={{ 
+            background: c.bg, color: c.text, padding: '6px 12px', 
+            borderRadius: 20, fontSize: 12, fontWeight: 700, 
+            display: 'flex', alignItems: 'center', gap: 6 
+          }}>
+            {c.icon} {c.label}
           </span>
         </div>
-        <p style={{ color: '#94a3b8', margin: '8px 0', fontSize: 14 }}>{item.description}</p>
-        {item.proof && <a href={item.proof} target="_blank" rel="noreferrer" style={{ color: '#60a5fa', fontSize: 12, textDecoration: 'none' }}>📎 View Proof</a>}
-        {item.status === 'approved' && <div style={{ fontSize: 12, color: '#10b981', marginTop: 8, fontWeight: 600 }}>Marks: {item.marks || 0}</div>}
+        <p style={{ color: 'var(--text-muted)', margin: '8px 0 16px', fontSize: 14, lineHeight: 1.5 }}>{item.description}</p>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {item.proof ? (
+            <a href={item.proof.startsWith('http') ? item.proof : `${axios.defaults.baseURL}${item.proof}`} target="_blank" rel="noreferrer" 
+               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--primary)', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
+              <ExternalLink size={14} /> View Document Attached
+            </a>
+          ) : <span></span>}
+          
+          {item.status === 'approved' && <div style={{ fontSize: 14, color: 'var(--success)', fontWeight: 700 }}>Awarded Marks: {item.marks || 0} / 100</div>}
+        </div>
+
         {item.status === 'rejected' && (
-          <div style={{ background: 'rgba(239,68,68,0.1)', padding: 10, borderRadius: 6, marginTop: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#dc2626', marginBottom: 4 }}>Admin Remarks:</div>
-            <div style={{ fontSize: 13, color: '#94a3b8' }}>{item.remarks || 'No remarks provided'}</div>
+          <div style={{ background: 'var(--bg-main)', padding: 12, borderRadius: 8, marginTop: 16, borderLeft: '4px solid var(--danger)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--danger)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Reviewer Remarks:</div>
+            <div style={{ fontSize: 14, color: 'var(--text-main)' }}>{item.remarks || 'No detailed remarks provided.'}</div>
           </div>
         )}
       </div>
@@ -134,61 +144,11 @@ export default function Achievements({ student }) {
   };
 
   const viewConfig = {
-    projects: {
-      title: '🛠️ Projects',
-      approved: approvedProjects,
-      rejected: rejectedProjects,
-      pending: pendingProjects,
-      emptyText: 'No projects submitted yet.',
-      submitTitle: '📤 Submit Project Proof',
-      namePlaceholder: 'Project Title',
-      descPlaceholder: 'Description',
-      submitType: 'projects'
-    },
-    courses: {
-      title: '📖 Online Courses',
-      approved: approvedCourses,
-      rejected: rejectedCourses,
-      pending: pendingCourses,
-      emptyText: 'No courses submitted yet.',
-      submitTitle: '📤 Submit Course Proof',
-      namePlaceholder: 'Course Title',
-      descPlaceholder: 'Platform',
-      submitType: 'courses'
-    },
-    internships: {
-      title: '💼 Internships',
-      approved: approvedInternships,
-      rejected: rejectedInternships,
-      pending: pendingInternships,
-      emptyText: 'No internships submitted yet.',
-      submitTitle: '📤 Submit Internship Proof',
-      namePlaceholder: 'Company / Title',
-      descPlaceholder: 'Role',
-      submitType: 'internships'
-    },
-    hackathons: {
-      title: '🏆 Hackathons',
-      approved: approvedHackathons,
-      rejected: rejectedHackathons,
-      pending: pendingHackathons,
-      emptyText: 'No hackathons submitted yet.',
-      submitTitle: '📤 Submit Hackathon Proof',
-      namePlaceholder: 'Hackathon Title',
-      descPlaceholder: 'Role / Short Description',
-      submitType: 'hackathons'
-    },
-    papers: {
-      title: '📄 Papers',
-      approved: approvedPapers,
-      rejected: rejectedPapers,
-      pending: pendingPapers,
-      emptyText: 'No papers submitted yet.',
-      submitTitle: '📤 Submit Paper Proof',
-      namePlaceholder: 'Paper Title',
-      descPlaceholder: 'Conference / Journal',
-      submitType: 'papers'
-    }
+    projects: { title: 'Development Projects', approved: approvedProjects, rejected: rejectedProjects, pending: pendingProjects, submitType: 'projects' },
+    courses: { title: 'Online Certifications', approved: approvedCourses, rejected: rejectedCourses, pending: pendingCourses, submitType: 'courses' },
+    internships: { title: 'Industrial Internships', approved: approvedInternships, rejected: rejectedInternships, pending: pendingInternships, submitType: 'internships' },
+    hackathons: { title: 'Competitive Hackathons', approved: approvedHackathons, rejected: rejectedHackathons, pending: pendingHackathons, submitType: 'hackathons' },
+    papers: { title: 'Research Publications', approved: approvedPapers, rejected: rejectedPapers, pending: pendingPapers, submitType: 'papers' }
   };
 
   const activeConfig = viewConfig[viewType];
@@ -196,104 +156,119 @@ export default function Achievements({ student }) {
   return (
     <div className="achievements-container">
       {error && (
-        <div style={{ background: 'rgba(220,38,38,0.1)', color: '#fca5a5', padding: 12, borderRadius: 6, marginBottom: 10, border: '1px solid rgba(220,38,38,0.3)' }}>
-          ⚠️ {error}
+        <div style={{ background: 'var(--danger-bg)', color: 'var(--danger)', padding: 16, borderRadius: 8, marginBottom: 24, display: 'flex', gap: 10, alignItems: 'center', fontWeight: 600 }}>
+          <XCircle size={18} /> {error}
         </div>
       )}
 
-      {viewType === null ? (
-        <>
-          <h1 className="achievements-title">Achievements</h1>
-          <div className="achievements-cards">
-            {achievements.map((item, idx) => (
-              <div
-                key={idx}
-                className="achievement-card"
-                onClick={() => setViewType(item.type)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="achievement-icon">{item.icon}</div>
-                <div className="achievement-label">{item.label}</div>
-                <div className="achievement-value">{item.value}</div>
-                <div style={{ fontSize: 12, marginTop: 8, opacity: 0.8, color: '#f8fafc' }}>Click to view →</div>
-              </div>
-            ))}
-          </div>
-        </>
-      ) : activeConfig ? (
-        <>
-          <button
-            onClick={() => setViewType(null)}
-            style={{ marginBottom: 20, padding: '10px 16px', background: '#0ea5e9', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontWeight: 600, transition: 'all 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#0284c7'}
-            onMouseLeave={e => e.currentTarget.style.background = '#0ea5e9'}
-          >
-            ← Back to Achievements
-          </button>
-          <h1 className="achievements-title">{activeConfig.title}</h1>
-
-          {activeConfig.approved.length > 0 && (
-            <div style={{ marginBottom: 30 }}>
-              <h3 style={{ color: '#10b981' }}>✅ Approved ({activeConfig.approved.length})</h3>
-              <div>{activeConfig.approved.map(item => renderSubmissionCard(item))}</div>
+      <AnimatePresence mode="wait">
+        {viewType === null ? (
+          <motion.div key="grid" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <h1 className="achievements-title">Achievements Index</h1>
+            <div className="achievements-cards">
+              {achievements.map((item, idx) => (
+                <div key={idx} className="achievement-card" onClick={() => setViewType(item.type)}>
+                  <div className="achievement-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>{item.icon}</div>
+                  <div className="achievement-label">{item.label}</div>
+                  <div className="achievement-value">{item.value}</div>
+                  <div style={{ fontSize: 13, marginTop: 12, opacity: 0.9, color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>Open Portfolio →</div>
+                </div>
+              ))}
             </div>
-          )}
-
-          {activeConfig.rejected.length > 0 && (
-            <div style={{ marginBottom: 30 }}>
-              <h3 style={{ color: '#dc2626' }}>❌ Rejected ({activeConfig.rejected.length})</h3>
-              <div>{activeConfig.rejected.map(item => renderSubmissionCard(item))}</div>
-            </div>
-          )}
-
-          {activeConfig.pending.length > 0 && (
-            <div style={{ marginBottom: 30 }}>
-              <h3 style={{ color: '#60a5fa' }}>⏳ Pending ({activeConfig.pending.length})</h3>
-              <div>{activeConfig.pending.map(item => renderSubmissionCard(item))}</div>
-            </div>
-          )}
-
-          {activeConfig.approved.length === 0 && activeConfig.rejected.length === 0 && activeConfig.pending.length === 0 && (
-            <div style={{ background: '#0f172a', padding: 40, borderRadius: 10, textAlign: 'center', color: '#94a3b8', marginBottom: 30, border: '1px solid rgba(255,255,255,0.06)' }}>
-              {activeConfig.emptyText}
-            </div>
-          )}
-
-          <div style={{ background: '#1e293b', padding: 20, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <h3 style={{ marginTop: 0, color: '#f8fafc' }}>{activeConfig.submitTitle}</h3>
-            <input placeholder={activeConfig.namePlaceholder} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={{ width: '100%', padding: 8, marginBottom: 8, background: '#0f172a', color: '#f8fafc', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6 }} />
-            <textarea placeholder={activeConfig.descPlaceholder} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ width: '100%', padding: 8, marginBottom: 8, background: '#0f172a', color: '#f8fafc', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6 }} />
-            <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={{ marginBottom: 8, background: '#0f172a', color: '#f8fafc', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: 8 }} />
-            <input type="file" onChange={handleFileChange} style={{ marginBottom: 8, color: '#94a3b8' }} />
-            <button onClick={() => submitAchievement(activeConfig.submitType)} disabled={submitting} style={{ padding: '8px 12px', background: '#10b981', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#059669'} onMouseLeave={e => e.currentTarget.style.background = '#10b981'}>
-              {submitting ? '⏳ Submitting...' : '📤 Submit'}
+          </motion.div>
+        ) : activeConfig ? (
+          <motion.div key="list" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <button
+              onClick={() => setViewType(null)}
+              style={{
+                marginBottom: 32, padding: '12px 20px', background: 'var(--surface)', color: 'var(--text-main)', 
+                border: '1px solid var(--border-light)', borderRadius: 10, cursor: 'pointer', fontSize: 14, 
+                fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-sm)'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--surface)'}
+            >
+              <ArrowLeft size={16} /> Portfolio Index
             </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <button onClick={() => setViewType(null)} style={{ marginBottom: 20, padding: '10px 16px', background: '#667eea', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
-            ← Back to Achievements
-          </button>
-          <h1 className="achievements-title">🎯 Placement Details</h1>
-          <div style={{ background: 'white', padding: 20, borderRadius: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.08)', border: '1px solid #e8eef5' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 15 }}>
-              <div style={{ background: '#f7fafc', padding: 12, borderRadius: 6 }}>
-                <div style={{ fontSize: 12, color: '#7f8c8d', marginBottom: 4 }}>Companies Attended</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: '#2c3e50' }}>{sd.achievements?.placement?.companiesAttended ?? 0}</div>
+            <h1 className="achievements-title" style={{ fontSize: 28 }}>{activeConfig.title}</h1>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32 }}>
+              <div>
+                {activeConfig.approved.length > 0 && <div style={{ marginBottom: 32 }}><h3 style={{ color: 'var(--success)', marginBottom: 16 }}>{activeConfig.approved.length} Validated</h3>{activeConfig.approved.map(renderSubmissionCard)}</div>}
+                
+                {activeConfig.pending.length > 0 && <div style={{ marginBottom: 32 }}><h3 style={{ color: 'var(--primary)', marginBottom: 16 }}>{activeConfig.pending.length} Under Review</h3>{activeConfig.pending.map(renderSubmissionCard)}</div>}
+                
+                {activeConfig.rejected.length > 0 && <div style={{ marginBottom: 32 }}><h3 style={{ color: 'var(--danger)', marginBottom: 16 }}>{activeConfig.rejected.length} Returned</h3>{activeConfig.rejected.map(renderSubmissionCard)}</div>}
+
+                {activeConfig.approved.length === 0 && activeConfig.rejected.length === 0 && activeConfig.pending.length === 0 && (
+                  <div style={{ background: 'var(--surface)', padding: 48, borderRadius: 16, textAlign: 'center', border: '1px dashed var(--border-light)' }}>
+                    <BookOpen size={48} style={{ color: 'var(--border-light)', marginBottom: 16 }} />
+                    <h3 style={{ color: 'var(--text-main)', marginBottom: 8 }}>No Submissions Found</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>You have not uploaded any records for this category yet.</p>
+                  </div>
+                )}
               </div>
-              <div style={{ background: '#f7fafc', padding: 12, borderRadius: 6 }}>
-                <div style={{ fontSize: 12, color: '#7f8c8d', marginBottom: 4 }}>Placement %</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: '#2c3e50' }}>{sd.achievements?.placement?.placementPercentage ?? 0}%</div>
-              </div>
-              <div style={{ background: '#f7fafc', padding: 12, borderRadius: 6 }}>
-                <div style={{ fontSize: 12, color: '#7f8c8d', marginBottom: 4 }}>Assessment</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#2c3e50' }}>{sd.achievements?.placement?.assessment || 'N/A'}</div>
+
+              <div style={{ background: 'var(--surface)', padding: 24, borderRadius: 16, border: '1px solid var(--border-light)', height: 'fit-content', boxShadow: 'var(--shadow-sm)' }}>
+                <h3 style={{ marginTop: 0, color: 'var(--text-main)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Upload size={18} color="var(--primary)" /> Draft New Entry
+                </h3>
+                
+                <input placeholder="Project/Course Title" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} 
+                  style={{ width: '100%', padding: '12px 16px', marginBottom: 16, background: 'var(--bg-main)', color: 'var(--text-main)', border: '1px solid var(--border-light)', borderRadius: 8, fontSize: 14 }} />
+                
+                <textarea placeholder="Description or Role" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} 
+                  style={{ width: '100%', padding: '12px 16px', marginBottom: 16, background: 'var(--bg-main)', color: 'var(--text-main)', border: '1px solid var(--border-light)', borderRadius: 8, fontSize: 14, minHeight: 100 }} />
+                
+                <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} 
+                  style={{ width: '100%', marginBottom: 16, background: 'var(--bg-main)', color: 'var(--text-main)', border: '1px solid var(--border-light)', borderRadius: 8, padding: '12px 16px', fontSize: 14 }} />
+                
+                <div style={{ background: 'var(--bg-main)', padding: 12, borderRadius: 8, border: '1px dashed var(--border-light)', marginBottom: 24 }}>
+                  <input type="file" onChange={handleFileChange} style={{ color: 'var(--text-muted)', fontSize: 13, width: '100%' }} />
+                </div>
+
+                <button onClick={() => submitAchievement(activeConfig.submitType)} disabled={submitting} 
+                  style={{ width: '100%', padding: 14, background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-sm)' }} 
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-hover)'} 
+                  onMouseLeave={e => e.currentTarget.style.background = 'var(--primary)'}>
+                  {submitting ? 'Uploading...' : 'Submit Evidence'}
+                </button>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </motion.div>
+        ) : (
+          <motion.div key="placement" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <button
+              onClick={() => setViewType(null)}
+              style={{
+                marginBottom: 32, padding: '12px 20px', background: 'var(--surface)', color: 'var(--text-main)', 
+                border: '1px solid var(--border-light)', borderRadius: 10, cursor: 'pointer', fontSize: 14, 
+                fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              <ArrowLeft size={16} /> Returns to Index
+            </button>
+            <h1 className="achievements-title" style={{ fontSize: 28, display: 'flex', alignItems: 'center', gap: 12 }}><Target color="var(--primary)"/> Placement Diagnostics</h1>
+            
+            <div style={{ background: 'var(--surface)', padding: 32, borderRadius: 16, border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24 }}>
+                <div style={{ background: 'var(--bg-main)', padding: 24, borderRadius: 12, border: '1px solid var(--border-light)' }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase' }}>Interviews Attended</div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--primary)' }}>{sd.achievements?.placement?.companiesAttended ?? 0}</div>
+                </div>
+                <div style={{ background: 'var(--bg-main)', padding: 24, borderRadius: 12, border: '1px solid var(--border-light)' }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase' }}>Conversion Rate</div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--success)' }}>{sd.achievements?.placement?.placementPercentage ?? 0}%</div>
+                </div>
+                <div style={{ background: 'var(--bg-main)', padding: 24, borderRadius: 12, border: '1px solid var(--border-light)' }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase' }}>Aptitude Standing</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>{sd.achievements?.placement?.assessment || 'Not Graded'}</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

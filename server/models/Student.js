@@ -26,6 +26,22 @@ const StudentSchema = new mongoose.Schema({
   password: { type: String, required: true },
   department: String,
   year: Number,
+  parentDetails: {
+    fatherName: String,
+    motherName: String,
+    contactNumber: String,
+    email: String,
+  },
+  behaviorLogs: [{
+    date: Date,
+    incident: String,
+    type: { type: String, enum: ['positive', 'negative', 'neutral'] },
+    reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' }
+  }],
+  attendanceLog: [{
+    date: Date,
+    status: { type: String, enum: ['present', 'absent', 'late', 'excused'] }
+  }],
   attendance: { type: Number, default: 0 },
   email: { type: String },
   feesDue: { type: Number, default: 0 },

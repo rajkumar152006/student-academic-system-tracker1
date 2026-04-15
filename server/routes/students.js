@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Student = require('../models/Student');
+const verifyToken = require('../middleware/auth');
 
 // GET all students
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const students = await Student.find({}, 'name rollNumber department year');
     res.json(students);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET student by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyToken, async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ msg: 'Student not found' });
@@ -24,7 +25,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create student
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   try {
     const student = new Student(req.body);
     await student.save();
@@ -35,7 +36,7 @@ router.post('/', async (req, res) => {
 });
 
 // POST add achievement item (projectsList / internshipsList / hackathonsList / papersList / coursesList)
-router.post('/:id/achievements', async (req, res) => {
+router.post('/:id/achievements', verifyToken, async (req, res) => {
   try {
     const { type, item } = req.body; // type: 'projects'|'internships'|'hackathons'|'papers'|'courses'
     const student = await Student.findById(req.params.id);
@@ -44,22 +45,18 @@ router.post('/:id/achievements', async (req, res) => {
     if (type === 'projects') {
       student.projectsList = student.projectsList || [];
       student.projectsList.push(item);
-      student.achievements.projects = (student.achievements.projects || 0) + 1;
     } else if (type === 'internships') {
       student.internshipsList = student.internshipsList || [];
       student.internshipsList.push(item);
-      student.achievements.internships = (student.achievements.internships || 0) + 1;
     } else if (type === 'hackathons') {
       student.hackathonsList = student.hackathonsList || [];
       student.hackathonsList.push(item);
     } else if (type === 'papers') {
       student.papersList = student.papersList || [];
       student.papersList.push(item);
-      student.achievements.papers = (student.achievements.papers || 0) + 1;
     } else if (type === 'courses') {
       student.coursesList = student.coursesList || [];
       student.coursesList.push(item);
-      student.achievements.courses = (student.achievements.courses || 0) + 1;
     } else {
       return res.status(400).json({ msg: 'Invalid achievement type' });
     }
@@ -72,7 +69,7 @@ router.post('/:id/achievements', async (req, res) => {
 });
 
 // PUT update student
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, async (req, res) => {
   try {
     const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(student);
@@ -81,8 +78,29 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// PUT update a specific submission atomically
+router.put('/:id/achievements/:listName/:idx', verifyToken, async (req, res) => {
+  try {
+    const { listName, idx } = req.params;
+    const { field, value } = req.body;
+    
+    // Construct the specific path for the set operation, e.g. "projectsList.0.status"
+    const updatePath = `${listName}.${idx}.${field}`;
+    
+    const student = await Student.findByIdAndUpdate(
+      req.params.id,
+      { $set: { [updatePath]: value } },
+      { new: true }
+    );
+    
+    res.json(student);
+  } catch (err) {
+    res.status(400).json({ msg: err.message });
+  }
+});
+
 // GET notification count (pending submissions)
-router.get('/notifications/count', async (req, res) => {
+router.get('/notifications/count', verifyToken, async (req, res) => {
   try {
     const students = await Student.find({});
     let totalPending = 0;
@@ -100,7 +118,7 @@ router.get('/notifications/count', async (req, res) => {
 });
 
 // GET all pending notifications (detailed list)
-router.get('/notifications/list', async (req, res) => {
+router.get('/notifications/list', verifyToken, async (req, res) => {
   try {
     const students = await Student.find({}, 'name rollNumber projectsList internshipsList hackathonsList papersList coursesList');
     const notifications = [];
@@ -139,7 +157,7 @@ router.get('/notifications/list', async (req, res) => {
 });
 
 // DELETE student
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, async (req, res) => {
   try {
     await Student.findByIdAndDelete(req.params.id);
     res.json({ msg: 'Deleted' });

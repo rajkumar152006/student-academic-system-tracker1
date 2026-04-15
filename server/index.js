@@ -1,3 +1,4 @@
+// DB connection migrated to MongoDB Atlas
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -12,6 +13,9 @@ connectDB();
 
 app.use('/api/students', require('./routes/students'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/teachers', require('./routes/teachers'));
+app.use('/api/courses', require('./routes/courses'));
+app.use('/api/classes', require('./routes/classes'));
 // serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/upload', require('./routes/upload'));
